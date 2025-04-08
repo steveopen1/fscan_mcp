@@ -114,9 +114,8 @@ pip install mcp==1.0.0
 
 ## 项目结构
 ```
-fscan\_MCP/
 
-├── fscan\_mcp\_server.py  # MCP 服务入口
+├── fscan_mcp_server.py  # MCP 服务入口
 
 ├── commands.json       # 指令模板配置
 
