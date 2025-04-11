@@ -11,10 +11,9 @@ Fscan MCP Server 是一个基于 **Model Context Protocol (MCP)** 的轻量级�
 ### 环境要求
 Python 3.8+
 MCP 客户端（如 [Cursor](https://www.cursor.so/) 或 [万径千机](https://github.com/xxx/wanjingqianji)）
-需要在mcp_Server同目录下放置fscan.exe
 
 ### 步骤 1：安装依赖
-
+需要在mcp_Server同目录下放置fscan.exe
 ```
 pip install mcp==1.0.0
 ```
