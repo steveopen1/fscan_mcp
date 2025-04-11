@@ -24,46 +24,26 @@ pip install mcp==1.0.0
 以 **Cursor IDE** 为例：
 
 创建配置文件 `mcp.config.json`：
-
-```
+```json
 {
-
-&#x20; "mcpServers": {
-
-&#x20;   "fscan-mcp-server": {
-
-&#x20;     "name": "Fscan 内网安全扫描工具",
-
-&#x20;     "command": "uv",
-
-&#x20;     "args": \[
-
-&#x20;       "--directory",
-
-&#x20;       "\${WORKSPACE}/fscan\_MCP",
-
-&#x20;       "run",
-
-&#x20;       "--with",
-
-&#x20;       "mcp",
-
-&#x20;       "mcp",
-
-&#x20;       "run",
-
-&#x20;       "fscan\_mcp\_server.py"
-
-&#x20;     ],
-
-&#x20;     "disabled": false,
-
-&#x20;     "autoApprove": \[]
-
-&#x20;   }
-
-&#x20; }
-
+    "mcpServers": {
+        "fscan-mcp-server": {
+            "name": "Fscan 内网安全扫描工具",
+            "command": "uv",
+            "args": [
+                "--directory",
+                "${WORKSPACE}/fscan_MCP",
+                "run",
+                "--with",
+                "mcp",
+                "mcp",
+                "run",
+                "fscan_mcp_server.py"
+            ],
+            "disabled": false,
+            "autoApprove": []
+        }
+    }
 }
 ```
 将配置文件导入 MCP 客户端（路径需根据实际项目调整）。
@@ -77,32 +57,6 @@ pip install mcp==1.0.0
 
 模型调用：fscan.exe -h 127.0.0.1 -p 1-65535 -nopoc
 ```
-
-### 扩展指令模板
-
-在 `commands.json` 中添加新规则：
-
-
-
-```
-{
-
-&#x20; "触发词": "扫描C段",
-
-&#x20; "参数": {
-
-&#x20;   "target": "192.168.1.1/24",
-
-&#x20;   "ports": "1-1000",
-
-&#x20;   "modules": "all"
-
-&#x20; },
-
-&#x20; "命令": "fscan.exe -h {target} -p {ports} -m {modules}"
-
-}
-```
 ## Fscan 功能支持
 
 | 功能模块      | 指令示例                   | 对应 Fscan 命令                                     |
@@ -114,11 +68,8 @@ pip install mcp==1.0.0
 
 ## 项目结构
 ```
-
 ├── fscan_mcp_server.py  # MCP 服务入口
-
 ├── commands.json       # 指令模板配置
-
 └── README.md           # 文档
 ```
 
